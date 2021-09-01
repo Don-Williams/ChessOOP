@@ -10,9 +10,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.ListIterator;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author Ashish Kedia and Adarsh Mohata
@@ -68,6 +67,7 @@ public class Main extends JFrame implements MouseListener
 	private JScrollPane wscroll,bscroll;
 	private String[] WNames={},BNames={};
 	private JSlider timeSlider;
+    private JCheckBox chess960CheckBox;
 	private BufferedImage image;
 	private Button start,wselect,bselect,WNewPlayer,BNewPlayer;
 	public static int timeRemaining=60;
@@ -109,6 +109,8 @@ public class Main extends JFrame implements MouseListener
     {
 		timeRemaining=60;
 		timeSlider = new JSlider();
+        chess960CheckBox = new JCheckBox();
+        chess960CheckBox.setText("Chess 960");
 		move="White";
 		wname=null;
 		bname=null;
@@ -147,9 +149,8 @@ public class Main extends JFrame implements MouseListener
 	    WNames=Wnames.toArray(WNames);	
 		BNames=Bnames.toArray(BNames);
 		
-		Cell cell;
+
 		board.setBorder(BorderFactory.createLoweredBevelBorder());
-		pieces.Piece P;
 		content=getContentPane();
 		setSize(Width,Height);
 		setTitle("Chess");
@@ -202,58 +203,10 @@ public class Main extends JFrame implements MouseListener
 		BlackPlayer.add(blackstats,BorderLayout.WEST);
 		controlPanel.add(WhitePlayer);
 		controlPanel.add(BlackPlayer);
-		
-		
-		//Defining all the Cells
-		boardState=new Cell[8][8];
-		for(int i=0;i<8;i++)
-			for(int j=0;j<8;j++)
-			{	
-				P=null;
-				if(i==0&&j==0)
-					P=br01;
-				else if(i==0&&j==7)
-					P=br02;
-				else if(i==7&&j==0)
-					P=wr01;
-				else if(i==7&&j==7)
-					P=wr02;
-				else if(i==0&&j==1)
-					P=bk01;
-				else if (i==0&&j==6)
-					P=bk02;
-				else if(i==7&&j==1)
-					P=wk01;
-				else if (i==7&&j==6)
-					P=wk02;
-				else if(i==0&&j==2)
-					P=bb01;
-				else if (i==0&&j==5)
-					P=bb02;
-				else if(i==7&&j==2)
-					P=wb01;
-				else if(i==7&&j==5)
-					P=wb02;
-				else if(i==0&&j==3)
-					P=bk;
-				else if(i==0&&j==4)
-					P=bq;
-				else if(i==7&&j==3)
-					P=wk;
-				else if(i==7&&j==4)
-					P=wq;
-				else if(i==1)
-				P=bp[j];
-				else if(i==6)
-					P=wp[j];
-				cell=new Cell(i,j,P);
-				cell.addMouseListener(this);
-				board.add(cell);
-				boardState[i][j]=cell;
-			}
+
 		showPlayer=new JPanel(new FlowLayout());  
 		showPlayer.add(timeSlider);
-		JLabel setTime=new JLabel("Set Timer(in mins):"); 
+		JLabel setTime=new JLabel("Set Timer(in mins):");
 		start=new Button("Start");
 		start.setBackground(Color.black);
 		start.setForeground(Color.white);
@@ -261,14 +214,15 @@ public class Main extends JFrame implements MouseListener
 		start.setPreferredSize(new Dimension(120,40));
 		setTime.setFont(new Font("Arial",Font.BOLD,16));
 		label = new JLabel("Time Starts now", JLabel.CENTER);
-		  label.setFont(new Font("SERIF", Font.BOLD, 30));
-	      displayTime=new JPanel(new FlowLayout());
-	      time=new JPanel(new GridLayout(3,3));
-	      time.add(setTime);
-	      time.add(showPlayer);
-	      displayTime.add(start);
-	      time.add(displayTime);
-	      controlPanel.add(time);
+        label.setFont(new Font("SERIF", Font.BOLD, 30));
+        displayTime=new JPanel(new FlowLayout());
+        time=new JPanel(new GridLayout(3,3));
+        time.add(setTime);
+        time.add(showPlayer);
+        displayTime.add(start);
+        time.add(chess960CheckBox);
+        time.add(displayTime);
+        controlPanel.add(time);
 		board.setMinimumSize(new Dimension(800,700));
 		
 		//The Left Layout When Game is inactive
@@ -459,6 +413,145 @@ public class Main extends JFrame implements MouseListener
     	}
     	return true;
     }
+
+
+    private void generateBoard() {
+
+        Cell cell;
+        pieces.Piece P;
+
+        //Chess960 Code
+        List<Piece> backWhitePieces = Arrays.asList(wr01, wr02, wk01, wk02, wb01, wb02, wk, wq);
+        List<Piece> backBlackPieces = Arrays.asList(br01, br02, bk01, bk02, bb01, bb02, bk, bq);
+        List<Integer> placementNums = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7);
+        System.out.println(chess960CheckBox.isSelected());
+        if (chess960CheckBox.isSelected()){
+//            do
+//            {
+//                Collections.shuffle(backWhitePieces);
+//            }
+//            while (backWhitePieces.indexOf(wb01) % 2 == 0 && backWhitePieces.indexOf(wb02) % 2 == 0);
+//
+//            do
+//            {
+//                Collections.shuffle(backBlackPieces);
+//            }
+//            while (backBlackPieces.indexOf(bb01) % 2 == 0 && backBlackPieces.indexOf(bb02) % 2 == 0);
+
+            Collections.shuffle(placementNums);
+
+            //Defining all the Cells
+            boardState=new Cell[8][8];
+            for(int i=0;i<8;i++)
+                for(int j=0;j<8;j++)
+                {
+//                    P=null;
+//                    if(i==0)
+//                    {
+//                        P = backBlackPieces.get(j);
+//                    }
+//                    else if(i==7)
+//                    {
+//                        P = backWhitePieces.get(j);
+//                    }
+//
+//                    cell=new Cell(i,j,P);
+//                    cell.addMouseListener(this);
+//                    board.add(cell);
+//                    boardState[i][j]=cell;
+                    P=null;
+                    if(i==0&&j == placementNums.get(1))
+                        P=br01;
+                    else if(i==0&&j == placementNums.get(2))
+                        P=br02;
+                    else if(i==7&&j == placementNums.get(1))
+                        P=wr01;
+                    else if(i==7&&j == placementNums.get(2))
+                        P=wr02;
+                    else if(i==0&&j == placementNums.get(3))
+                        P=bk01;
+                    else if (i==0&&j == placementNums.get(4))
+                        P=bk02;
+                    else if(i==7&&j == placementNums.get(3))
+                        P=wk01;
+                    else if (i==7&&j == placementNums.get(4))
+                        P=wk02;
+                    else if(i==0&&j == placementNums.get(5))
+                        P=bb01;
+                    else if (i==0&&j == placementNums.get(6))
+                        P=bb02;
+                    else if(i==7&&j == placementNums.get(5))
+                        P=wb01;
+                    else if(i==7&&j == placementNums.get(6))
+                        P=wb02;
+                    else if(i==0&&j == placementNums.get(7))
+                        P=bk;
+                    else if(i==0&&j == placementNums.get(0))
+                        P=bq;
+                    else if(i==7&&j == placementNums.get(7))
+                        P=wk;
+                    else if(i==7&&j == placementNums.get(0))
+                        P=wq;
+                    else if(i==1)
+                        P=bp[j];
+                    else if(i==6)
+                        P=wp[j];
+                    cell=new Cell(i,j,P);
+                    cell.addMouseListener(this);
+                    board.add(cell);
+                    boardState[i][j]=cell;
+                }
+        }
+        else {
+            //Defining all the Cells
+            boardState=new Cell[8][8];
+            for(int i=0;i<8;i++)
+                for(int j=0;j<8;j++)
+                {
+                    P=null;
+                    if(i==0&&j==0)
+                        P=br01;
+                    else if(i==0&&j==7)
+                        P=br02;
+                    else if(i==7&&j==0)
+                        P=wr01;
+                    else if(i==7&&j==7)
+                        P=wr02;
+                    else if(i==0&&j==1)
+                        P=bk01;
+                    else if (i==0&&j==6)
+                        P=bk02;
+                    else if(i==7&&j==1)
+                        P=wk01;
+                    else if (i==7&&j==6)
+                        P=wk02;
+                    else if(i==0&&j==2)
+                        P=bb01;
+                    else if (i==0&&j==5)
+                        P=bb02;
+                    else if(i==7&&j==2)
+                        P=wb01;
+                    else if(i==7&&j==5)
+                        P=wb02;
+                    else if(i==0&&j==3)
+                        P=bk;
+                    else if(i==0&&j==4)
+                        P=bq;
+                    else if(i==7&&j==3)
+                        P=wk;
+                    else if(i==7&&j==4)
+                        P=wq;
+                    else if(i==1)
+                        P=bp[j];
+                    else if(i==6)
+                        P=wp[j];
+                    cell=new Cell(i,j,P);
+                    cell.addMouseListener(this);
+                    board.add(cell);
+                    boardState[i][j]=cell;
+                }
+        }
+    }
 	
     
     @SuppressWarnings("deprecation")
@@ -642,6 +735,7 @@ public class Main extends JFrame implements MouseListener
 		if(White==null||Black==null)
 			{JOptionPane.showMessageDialog(controlPanel, "Fill in the details");
 			return;}
+        generateBoard();
 		White.updateGamesPlayed();
 		White.Update_Player();
 		Black.updateGamesPlayed();
